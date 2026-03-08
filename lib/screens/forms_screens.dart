@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:forms/providers/form.providers.dart';
 import 'package:forms/widgets/countries_widget.dart';
 import 'package:forms/widgets/email_widget.dart';
 import 'package:forms/widgets/name_field.dart';
 import 'package:forms/widgets/password_widget.dart';
 import 'package:forms/widgets/phone_widget.dart';
 import 'package:forms/widgets/terms_checkbox.dart';
+import 'package:provider/provider.dart';
 
 class FormsScreen extends StatefulWidget {
   const FormsScreen({super.key});
@@ -14,17 +16,13 @@ class FormsScreen extends StatefulWidget {
 }
 
 class _FormsScreensState extends State<FormsScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  bool _acceptTerms = false;
   String? _selectedCountry;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    final formProvider = Provider.of<FormProvider>(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(title: const Text('My Form')),
@@ -41,31 +39,29 @@ class _FormsScreensState extends State<FormsScreen> {
                   selectedCountry: _selectedCountry,
                   onChanged: (newValue) {
                     setState(() => _selectedCountry = newValue);
-                  }
+                  },
                 ),
                 // ##########   NAME INPUT   ########## //
                 const SizedBox(height: 20),
-                NameField(nameController: _nameController),
+                NameField(nameController: formProvider.nameController),
                 // ##########   EMAIL INPUT   ########## //
                 const SizedBox(height: 20),
-                EmailField(emailController: _emailController),
+                EmailField(emailController: formProvider.emailController),
                 // ##########   PHONE INPUT   ########## //\
                 const SizedBox(height: 20),
-                PhoneField(phoneController: _phoneController),
+                PhoneField(phoneController: formProvider.phoneController),
                 // ##########   PASSWORD INPUT   ########## //
                 const SizedBox(height: 20),
-                PasswordField(passwordController: _passwordController),
+                PasswordField(passwordController: formProvider.passwordController),
                 // ##########   TERMS AND CONDITION CHECKBOX   ########## //
                 const SizedBox(height: 20),
                 TermsCheckbox(
-                  value: _acceptTerms,
+                  value: formProvider.acceptTerms,
                   onChanged: (bool? value) {
-                    setState(() {
-                      _acceptTerms = value ?? false;
-                    });
+                    formProvider.toogleAcceptTerms(value ?? false);
                   },
                 ),
-                if (!_acceptTerms)
+                if (!formProvider.acceptTerms)
                   const Text(
                     'First accept terms and conditions',
                     style: TextStyle(color: Colors.red),
@@ -74,11 +70,11 @@ class _FormsScreensState extends State<FormsScreen> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate() && _acceptTerms) {
+                    if (formProvider.validateForm(_formKey)) {
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text('Form is OK! c:')));
-                    } else if (!_acceptTerms) {
+                    } else if (!formProvider.acceptTerms) {
                       setState(() {});
                     }
                   },
