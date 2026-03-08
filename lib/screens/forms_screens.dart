@@ -13,7 +13,17 @@ class _FormsScreensState extends State<FormsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _acceptTerms = false;
+  String? _selectedCountry;
+  List<String> countries = [
+    'Argentina',
+    'Venezuela',
+    'Cuba',
+    'Bolivia',
+    'Chile',
+    'Uruguay',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +38,30 @@ class _FormsScreensState extends State<FormsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                // ##########   INPUT SELECTOR   ########## //
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(labelText: 'Select your country'),
+                  initialValue: _selectedCountry,
+                  items: countries.map((String country) {
+                    return DropdownMenuItem(
+                      value: country,
+                      child: Text(country),
+                    );
+                  }).toList(),
+                  onChanged: ((String? newValue) {
+                    setState(() {
+                      _selectedCountry = newValue;
+                    });
+                  }),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select your country';
+                    }
+                    return null;
+                  },
+                ),
                 // ##########   NAME INPUT   ########## //
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -120,22 +153,22 @@ class _FormsScreensState extends State<FormsScreen> {
                         });
                       },
                     ),
-                    const Text('Agree with terms and conditions')
+                    const Text('Agree with terms and conditions'),
                   ],
                 ),
                 if (!_acceptTerms)
                   const Text(
                     'First accept terms and conditions',
-                    style: TextStyle(color: Colors.red)
+                    style: TextStyle(color: Colors.red),
                   ),
                 // ##########   SUBMIT   ########## //
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate() && _acceptTerms) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Form is OK! c:'))
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text('Form is OK! c:')));
                     } else if (!_acceptTerms) {
                       setState(() {});
                     }
