@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:forms/widgets/countries_widget.dart';
+import 'package:forms/widgets/email_widget.dart';
+import 'package:forms/widgets/name_field.dart';
+import 'package:forms/widgets/password_widget.dart';
+import 'package:forms/widgets/phone_widget.dart';
+import 'package:forms/widgets/terms_checkbox.dart';
 
 class FormsScreen extends StatefulWidget {
   const FormsScreen({super.key});
@@ -16,14 +22,6 @@ class _FormsScreensState extends State<FormsScreen> {
 
   bool _acceptTerms = false;
   String? _selectedCountry;
-  List<String> countries = [
-    'Argentina',
-    'Venezuela',
-    'Cuba',
-    'Bolivia',
-    'Chile',
-    'Uruguay',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -39,122 +37,33 @@ class _FormsScreensState extends State<FormsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 // ##########   INPUT SELECTOR   ########## //
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(labelText: 'Select your country'),
-                  initialValue: _selectedCountry,
-                  items: countries.map((String country) {
-                    return DropdownMenuItem(
-                      value: country,
-                      child: Text(country),
-                    );
-                  }).toList(),
-                  onChanged: ((String? newValue) {
-                    setState(() {
-                      _selectedCountry = newValue;
-                    });
-                  }),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select your country';
-                    }
-                    return null;
-                  },
+                CountriesSelector(
+                  selectedCountry: _selectedCountry,
+                  onChanged: (newValue) {
+                    setState(() => _selectedCountry = newValue);
+                  }
                 ),
                 // ##########   NAME INPUT   ########## //
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    hintText: 'Enter your name',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Name can not be empty';
-                    }
-                    return null;
-                  },
-                ),
+                NameField(nameController: _nameController),
                 // ##########   EMAIL INPUT   ########## //
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Email can not be empty';
-                    }
-                    if (!RegExp(
-                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.'
-                      r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
-                    ).hasMatch(value)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
+                EmailField(emailController: _emailController),
                 // ##########   PHONE INPUT   ########## //\
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Phone',
-                    hintText: 'Enter your phone',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Phone can not be empty';
-                    }
-                    if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                      return 'Please enter a valida phone';
-                    }
-                    if (value.length > 10) {
-                      return 'The phone number can not exced 10 digits';
-                    }
-                    if (value.length < 8) {
-                      return 'The phone number must have at least 8 digits';
-                    }
-                    return null;
-                  },
-                ),
+                PhoneField(phoneController: _phoneController),
                 // ##########   PASSWORD INPUT   ########## //
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your secure password',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password can not be empty';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must have at least 8 characters';
-                    }
-                    return null;
-                  },
-                ),
+                PasswordField(passwordController: _passwordController),
                 // ##########   TERMS AND CONDITION CHECKBOX   ########## //
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _acceptTerms,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _acceptTerms = !_acceptTerms;
-                        });
-                      },
-                    ),
-                    const Text('Agree with terms and conditions'),
-                  ],
+                TermsCheckbox(
+                  value: _acceptTerms,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _acceptTerms = value ?? false;
+                    });
+                  },
                 ),
                 if (!_acceptTerms)
                   const Text(
